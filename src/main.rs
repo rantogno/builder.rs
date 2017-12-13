@@ -1,14 +1,6 @@
 extern crate clap;
 use clap::{Arg, App};
 
-fn pkg_print(pkg: &str) {
-    println!("Building package: {}", pkg);
-}
-
-fn build_all() {
-    println!("No packages specified. Building all of them.");
-}
-
 fn main() {
     let matches = App::new("Builder script")
         .version("0.1")
@@ -27,11 +19,12 @@ fn main() {
         println!("Printing verbose output...")
     }
 
-    let pkg_values = matches.values_of("PACKAGE");
+    let pkglist = match matches.values_of("PACKAGE") {
+        Some(values) => values.collect(),
+        None => vec!["all"],
+    };
 
-    match pkg_values {
-        None => build_all(),
-        _ => pkg_values.unwrap().for_each(pkg_print),
+    for pkg in pkglist {
+        println!("printing pkg: {}", pkg);
     }
-
 }
