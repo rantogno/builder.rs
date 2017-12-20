@@ -14,6 +14,7 @@ enum Command {
     Install{options: InstallOptions},
     Clean,
     Invalid,
+    Empty,
 }
 
 static PACKAGES: &'static [&str] = &[
@@ -70,17 +71,17 @@ fn parse_matches(matches: &clap::ArgMatches) -> Config {
     } else {
         false
     };
-    Config{
-        verbose: v,
-        cmd: match matches.subcommand() {
-            ("install", Some(sub_m)) => {
-                Command::Install{options: parse_install(&sub_m)}
-            }
-            ("clean", Some(_)) => Command::Clean,
-            (&_, Some(_)) => Command::Invalid,
-            (&_, None) => Command::Invalid,
-        },
-    }
+
+    let cmd = match matches.subcommand() {
+        ("install", Some(sub_m)) => {
+            Command::Install{options: parse_install(&sub_m)}
+        }
+        ("clean", Some(_)) => Command::Clean,
+        (invalid, Some(_)) => Command::Invalid,
+        (&_, None) => Command::Empty,
+    };
+
+    Config { verbose: v, cmd: cmd }
 }
 
 fn main() {
